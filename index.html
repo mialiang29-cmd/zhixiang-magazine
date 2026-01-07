@@ -32,7 +32,7 @@
     .page {
       width: var(--a4-width);
       height: var(--a4-height);
-      background-image: url("assets/covers/cover-2026-h1.jpg");
+      background-image: url("assets/covers/cover-2026-h1.jpg?v=2");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -43,25 +43,43 @@
     }
 
     /* 轻遮罩：保证文字可读，但不压背景 */
-   .coverOverlay{
-  position:absolute;
-  inset:0;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,.18) 0%,
-    rgba(255,255,255,.10) 40%,
-    rgba(255,255,255,.06) 100%
-  );
-}
+    .coverOverlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,.08) 0%,
+        rgba(255,255,255,.04) 45%,
+        rgba(255,255,255,.02) 100%
+      );
+    }
+
+    .coverContent {
+      position: relative;
+      height: 100%;
+      padding: 48px 56px;
+      display: flex;
+      flex-direction: column;
+    }
 
     .tag {
       border: 1px solid rgba(15,23,42,.2);
-      padding: 8px 18px;
+      padding: 10px 22px;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
       white-space: nowrap;
       background: rgba(255,255,255,.55);
+    }
+
+    .tagRow {
+      position: absolute;
+      left: 56px;
+      right: 56px;
+      bottom: 78px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
 
     .pager {
@@ -89,7 +107,8 @@
 
 <body>
   <div class="page">
-    <div class="overlay">
+    <div class="coverOverlay"></div>
+    <div class="coverContent">
 
       <!-- 顶部 -->
       <div class="flex justify-between items-start">
@@ -113,7 +132,7 @@
           2026 AI 行业趋势与实践
         </p >
 
-        <div class="mt-10 flex gap-4 flex-wrap">
+        <div class="tagRow">
           <span class="tag">趋势洞察</span>
           <span class="tag">技术范式</span>
           <span class="tag">产业变革</span>
