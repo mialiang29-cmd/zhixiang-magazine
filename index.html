@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>智向 · 2026 AI 行业趋势与实践</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --a4-width: 794px;
+      --a4-height: 1123px;
+    }
+
+    body {
+      margin: 0;
+      background: #0b1020;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: "Inter","Noto Sans SC",sans-serif;
+    }
+
+    .page {
+      width: var(--a4-width);
+      height: var(--a4-height);
+      background-image: url("assets/covers/cover-2026-h1.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 18px;
+      box-shadow: 0 40px 120px rgba(15,23,42,.45);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 轻遮罩：保证文字可读，但不压背景 */
+   .coverOverlay{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.18) 0%,
+    rgba(255,255,255,.10) 40%,
+    rgba(255,255,255,.06) 100%
+  );
+}
+
+    .tag {
+      border: 1px solid rgba(15,23,42,.2);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      background: rgba(255,255,255,.55);
+    }
+
+    .pager {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,.25);
+    }
+
+    .dot.active {
+      background: rgba(15,23,42,.8);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="overlay">
+
+      <!-- 顶部 -->
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="text-[11px] tracking-[0.32em] text-slate-500 whitespace-nowrap">
+            AI SIGNAL · AI INDUSTRY MAGAZINE
+          </div>
+        </div>
+        <div class="text-[12px] tracking-[0.28em] text-slate-500 whitespace-nowrap">
+          2026 · H1
+        </div>
+      </div>
+
+      <!-- 主标题区 -->
+      <div class="mt-32 max-w-[520px]">
+        <h1 class="text-[88px] font-black leading-none text-slate-900">
+          智向
+        </h1>
+
+        <p class="mt-6 text-[20px] font-semibold text-slate-700">
+          2026 AI 行业趋势与实践
+        </p >
+
+        <div class="mt-10 flex gap-4 flex-wrap">
+          <span class="tag">趋势洞察</span>
+          <span class="tag">技术范式</span>
+          <span class="tag">产业变革</span>
+          <span class="tag">产品演进</span>
+        </div>
+      </div>
+
+      <!-- 翻页点 -->
+      <div class="pager">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
