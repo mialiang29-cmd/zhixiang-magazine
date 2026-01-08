@@ -2,118 +2,249 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>智向 · 2026 AI 行业趋势与实践</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智向 · 2026 AI 行业趋势与实践</title>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Fonts (optional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
 
   <style>
-    :root {
-      --a4-width: 794px;
-      --a4-height: 1123px;
+    :root{
+      --a4-w: 794px;  /* 210mm @96dpi */
+      --a4-h: 1123px; /* 297mm @96dpi */
+      --safe: 56px;   /* 安全边距 */
+      --ink: #0f172a;
+      --muted: rgba(15,23,42,.65);
     }
 
-    body {
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
       margin: 0;
-      background: #0b1020;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      font-family: "Inter","Noto Sans SC",sans-serif;
+      font-family: Inter, "Noto Sans SC", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 50% 10%, rgba(255,255,255,.08), transparent 60%),
+                  #0b1020;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      overflow: hidden;
     }
 
-    .page {
-      width: var(--a4-width);
-      height: var(--a4-height);
-      background-image: url("assets/covers/cover-2026-h1.jpg");
+    /* 负责缩放的外层 */
+    .stage{
+      width: var(--a4-w);
+      height: var(--a4-h);
+      transform-origin: center top;
+      will-change: transform;
+    }
+
+    /* A4 纸张 */
+    .page{
+      width: var(--a4-w);
+      height: var(--a4-h);
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+      background: #f4f2ef;
+      border: 1px solid rgba(148,163,184,.25);
+      box-shadow: 0 40px 120px rgba(2,6,23,.55);
+    }
+
+    /* 封面背景全铺 */
+    .cover{
+      background-image: url("assets/covers/cover-2026-h1.jpg?v=2");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      border-radius: 18px;
-      box-shadow: 0 40px 120px rgba(15,23,42,.45);
-      overflow: hidden;
-      position: relative;
     }
 
-    /* 轻遮罩：保证文字可读，但不压背景 */
-   .coverOverlay{
-  position:absolute;
-  inset:0;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,.18) 0%,
-    rgba(255,255,255,.10) 40%,
-    rgba(255,255,255,.06) 100%
-  );
-}
-
-    .tag {
-      border: 1px solid rgba(15,23,42,.2);
-      padding: 8px 18px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 500;
-      white-space: nowrap;
-      background: rgba(255,255,255,.55);
-    }
-
-    .pager {
+    /* 遮罩：用于提升文字可读性（现在更透明，避免“蒙一层纸”） */
+    .coverShade{
       position: absolute;
-      bottom: 20px;
+      inset: 0;
+      background:
+        radial-gradient(900px 900px at 20% 25%, rgba(255,255,255,.18), rgba(255,255,255,.05) 45%, rgba(255,255,255,0) 75%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.08));
+      pointer-events: none;
+    }
+
+    /* 内容层 */
+    .coverInner{
+      position: relative;
+      height: 100%;
+      padding: var(--safe);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 顶部信息栏：左右两端 */
+    .topbar{
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .mast{
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 320px;
+    }
+
+    .mast .line1{
+      font-size: 12px;
+      letter-spacing: .34em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,.55);
+      font-weight: 700;
+      white-space: nowrap; /* 不换行 */
+    }
+
+    .mast .line2{
+      font-size: 11px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,.45);
+      font-weight: 600;
+      white-space: nowrap; /* 不换行 */
+    }
+
+    .issue{
+      font-size: 12px;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,.55);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* 主标题区 */
+    .hero{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 560px; /* 防止太宽，便于阅读 */
+      padding-top: 24px;
+    }
+
+    .title{
+      margin: 0;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: .02em;
+      line-height: .95;
+      font-size: 112px; /* 更有冲击力 */
+      text-shadow: 0 2px 24px rgba(2,6,23,.10);
+    }
+
+    .subtitle{
+      margin: 18px 0 0;
+      font-size: 26px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: rgba(15,23,42,.78);
+      max-width: 520px;
+      white-space: nowrap; /* 防止无意义换行 */
+    }
+
+    /* 底部四个栏目：放大，放在最下面 */
+    .tags{
+      margin-top: auto;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 14px;
+      padding-bottom: 56px; /* 给分页器留空间 */
+      align-items: center;
+    }
+
+    .tag{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.18);
+      background: rgba(255,255,255,.55);
+      color: rgba(15,23,42,.78);
+      font-weight: 800;
+      letter-spacing: .12em;
+      font-size: 14px;
+      white-space: nowrap; /* 不换行 */
+      backdrop-filter: blur(6px);
+    }
+
+    /* 底部分页器（放在页面内部底部，离内容更近） */
+    .pager{
+      position: absolute;
       left: 0;
       right: 0;
+      bottom: 18px;
       display: flex;
+      align-items: center;
       justify-content: center;
+      gap: 14px;
+      pointer-events: none; /* 纯展示，避免挡内容 */
+    }
+
+    .dotRow{
+      display: flex;
       gap: 8px;
+      align-items: center;
     }
-
-    .dot {
-      width: 8px;
-      height: 8px;
+    .dot{
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: rgba(15,23,42,.35);
+    }
+    .dot.active{
+      background: rgba(15,23,42,.78);
+    }
+    .btnCircle{
+      width: 34px;
+      height: 34px;
       border-radius: 999px;
-      background: rgba(15,23,42,.25);
+      border: 1px solid rgba(15,23,42,.18);
+      background: rgba(255,255,255,.45);
+      backdrop-filter: blur(6px);
     }
 
-    .dot.active {
-      background: rgba(15,23,42,.8);
+    /* 打印：取消缩放与阴影，输出 A4 */
+    @media print{
+      body{ background:#fff; padding:0; overflow: visible; }
+      .stage{ transform:none !important; }
+      .page{ border:none; box-shadow:none; border-radius:0; }
+      .pager{ display:none; }
     }
   </style>
 </head>
 
 <body>
-  <div class="page">
-    <div class="overlay">
+  <!-- 这个 stage 会被 JS 自动缩放以适配屏幕 -->
+  <div class="stage" id="stage">
+    <div class="page cover">
+      <div class="coverShade" aria-hidden="true"></div>
 
-      <!-- 顶部 -->
-      <div class="flex justify-between items-start">
-        <div>
-          <div class="text-[11px] tracking-[0.32em] text-slate-500 whitespace-nowrap">
-            AI SIGNAL · AI INDUSTRY MAGAZINE
+      <div class="coverInner">
+        <div class="topbar">
+          <div class="mast">
+            <div class="line1">AI SIGNAL</div>
+            <div class="line2">AI INDUSTRY MAGAZINE</div>
           </div>
+          <div class="issue">2026 · H1</div>
         </div>
-        <div class="text-[12px] tracking-[0.28em] text-slate-500 whitespace-nowrap">
-          2026 · H1
+
+        <div class="hero">
+          <h1 class="title">智向</h1>
+          <div class="subtitle">2026 AI 行业趋势与实践</div>
         </div>
-      </div>
 
-      <!-- 主标题区 -->
-      <div class="mt-32 max-w-[520px]">
-        <h1 class="text-[88px] font-black leading-none text-slate-900">
-          智向
-        </h1>
-
-        <p class="mt-6 text-[20px] font-semibold text-slate-700">
-          2026 AI 行业趋势与实践
-        </p >
-
-        <div class="mt-10 flex gap-4 flex-wrap">
+        <div class="tags" aria-label="栏目标签">
           <span class="tag">趋势洞察</span>
           <span class="tag">技术范式</span>
           <span class="tag">产业变革</span>
@@ -121,16 +252,45 @@
         </div>
       </div>
 
-      <!-- 翻页点 -->
-      <div class="pager">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot active"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
+      <!-- 分页器（示例：封面是第1页） -->
+      <div class="pager" aria-hidden="true">
+        <div class="btnCircle"></div>
+        <div class="dotRow">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="btnCircle"></div>
       </div>
-
     </div>
   </div>
+
+  <script>
+    // 自动把 A4 画布缩放到屏幕可见区域（解决“没有屏幕适应缩放、文字显示不全”）
+    (function () {
+      const stage = document.getElementById('stage');
+      const A4W = 794, A4H = 1123;
+
+      function fit() {
+        const pad = 24; // 给四周留一点黑边
+        const vw = window.innerWidth - pad;
+        const vh = window.innerHeight - pad;
+
+        const s = Math.min(vw / A4W, vh / A4H, 1); // 不放大超过 1（避免糊）
+        stage.style.transform = `scale(${s})`;
+      }
+
+      window.addEventListener('resize', fit);
+      fit();
+    })();
+
+    // 说明：你之前看到的 “LF / 奇怪符号” 一般是 HTML 里被插入了文字节点或拷贝残留。
+    // 这份代码里没有任何 LF 文本。如果你仍看到，请确认你覆盖了旧 index.html（不要混用两份）。
+  </script>
 </body>
 </html>
+
