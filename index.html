@@ -1,4 +1,3 @@
-update magazine layout
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -6,292 +5,1560 @@ update magazine layout
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>智向 · 2026 AI 行业趋势与实践</title>
 
-  <!-- Fonts (optional) -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
 
   <style>
     :root{
-      --a4-w: 794px;  /* 210mm @96dpi */
-      --a4-h: 1123px; /* 297mm @96dpi */
-      --safe: 56px;   /* 安全边距 */
-      --ink: #0f172a;
-      --muted: rgba(15,23,42,.65);
+      /* A4 @96dpi */
+      --a4-w: 794px;
+      --a4-h: 1123px;
+
+      /* Cover background */
+      --cover-bg: url("assets/covers/cover-2026-h1.png");
+
+      /* Title block position (move left/right/up/down here) */
+      --title-x: 110px;
+      --title-y: 235px;
+
+      /* Theme */
+      --ink: rgba(255,255,255,.92);
+      --ink-2: rgba(255,255,255,.78);
+      --ink-3: rgba(255,255,255,.50);
+
+      --paper-shadow: 0 40px 120px rgba(15, 23, 42, 0.45);
+      --bg: #0b1020;
+      --radius: 18px;
     }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+
     body{
       margin: 0;
-      font-family: Inter, "Noto Sans SC", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 50% 10%, rgba(255,255,255,.08), transparent 60%),
-                  #0b1020;
+      background: var(--bg);
+      font-family: "Inter","Noto Sans SC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
       display: grid;
       place-items: center;
       padding: 18px;
-      overflow: hidden;
+      color: var(--ink);
     }
 
-    /* 负责缩放的外层 */
-    .stage{
+    /* ====== Responsive A4 scaling ====== */
+    .stage{ width: 100%; display: grid; place-items: center; }
+    .scale-wrap{ transform-origin: center top; will-change: transform; }
+
+    .viewport{
       width: var(--a4-w);
       height: var(--a4-h);
-      transform-origin: center top;
-      will-change: transform;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #f4f2ef;
+      box-shadow: var(--paper-shadow);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      position: relative;
     }
 
-    /* A4 纸张 */
+    /* Pages slider */
+    .pages{
+      height: 100%;
+      display: flex;
+      transition: transform .55s cubic-bezier(.2,.9,.2,1);
+    }
     .page{
       width: var(--a4-w);
       height: var(--a4-h);
-      border-radius: 22px;
-      overflow: hidden;
+      flex: 0 0 auto;
       position: relative;
-      background: #f4f2ef;
-      border: 1px solid rgba(148,163,184,.25);
-      box-shadow: 0 40px 120px rgba(2,6,23,.55);
+      overflow: hidden;
     }
 
-    /* 封面背景全铺 */
+    /* ====== Cover ====== */
     .cover{
-      background-image: url("assets/covers/cover-2026-h1.jpg?v=2");
+      background-image: var(--cover-bg);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
 
-    /* 遮罩：用于提升文字可读性（现在更透明，避免“蒙一层纸”） */
-    .coverShade{
-      position: absolute;
-      inset: 0;
+    /* Contrast + vignette (keeps texture, no “white haze”) */
+    .cover::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
       background:
-        radial-gradient(900px 900px at 20% 25%, rgba(255,255,255,.18), rgba(255,255,255,.05) 45%, rgba(255,255,255,0) 75%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.08));
-      pointer-events: none;
+        radial-gradient(900px 700px at 40% 20%, rgba(0,0,0,0) 0%, rgba(0,0,0,.28) 72%, rgba(0,0,0,.48) 100%),
+        linear-gradient(to bottom, rgba(0,0,0,.10), rgba(0,0,0,.22));
+      z-index:1;
+    }
+    /* Left reading zone darken */
+    .cover::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background: linear-gradient(90deg,
+        rgba(0,0,0,.35) 0%,
+        rgba(0,0,0,.18) 40%,
+        rgba(0,0,0,0) 75%
+      );
+      z-index:1;
     }
 
-    /* 内容层 */
-    .coverInner{
-      position: relative;
-      height: 100%;
-      padding: var(--safe);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* 顶部信息栏：左右两端 */
-    .topbar{
+    .cover-top{
+      position: absolute;
+      top: 42px;
+      left: 56px;
+      right: 56px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 24px;
+      z-index: 2;
     }
-
-    .mast{
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 320px;
-    }
-
-    .mast .line1{
-      font-size: 12px;
-      letter-spacing: .34em;
-      text-transform: uppercase;
-      color: rgba(15,23,42,.55);
-      font-weight: 700;
-      white-space: nowrap; /* 不换行 */
-    }
-
-    .mast .line2{
+    .cover-meta,
+    .cover-issue{
+      font-family: "Inter", sans-serif;
       font-size: 11px;
-      letter-spacing: .28em;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: rgba(15,23,42,.45);
-      font-weight: 600;
-      white-space: nowrap; /* 不换行 */
-    }
-
-    .issue{
-      font-size: 12px;
-      letter-spacing: .26em;
-      text-transform: uppercase;
-      color: rgba(15,23,42,.55);
-      font-weight: 700;
+      color: rgba(255,255,255,.55);
+      text-shadow: 0 10px 22px rgba(0,0,0,.45);
       white-space: nowrap;
     }
 
-    /* 主标题区 */
-    .hero{
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      max-width: 560px; /* 防止太宽，便于阅读 */
-      padding-top: 24px;
+    /* Title block */
+    .title-block{
+      position: absolute;
+      left: var(--title-x);
+      top: var(--title-y);
+      z-index: 2;
+      max-width: 420px;
     }
 
-    .title{
-      margin: 0;
+    .cover-title{
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 96px;
       font-weight: 900;
-      color: var(--ink);
-      letter-spacing: .02em;
-      line-height: .95;
-      font-size: 112px; /* 更有冲击力 */
-      text-shadow: 0 2px 24px rgba(2,6,23,.10);
+      line-height: 1;
+      letter-spacing: -0.015em;
+      color: rgba(255,255,255,.96);
+      text-shadow:
+        0 18px 40px rgba(0,0,0,.55),
+        0 2px 0 rgba(0,0,0,.25);
     }
 
-    .subtitle{
-      margin: 18px 0 0;
-      font-size: 26px;
-      line-height: 1.25;
-      font-weight: 700;
-      color: rgba(15,23,42,.78);
-      max-width: 520px;
-      white-space: nowrap; /* 防止无意义换行 */
+    .cover-subtitle{
+      margin-top: 14px;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,.78);
+      text-shadow: 0 14px 30px rgba(0,0,0,.45);
+      white-space: nowrap;
     }
 
-    /* 底部四个栏目：放大，放在最下面 */
-    .tags{
-      margin-top: auto;
+    /* ===== Apple-style frosted glass title (fixed + valid CSS) ===== */
+    .glass{
+      padding: 28px 36px 30px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(16px) saturate(1.1);
+      -webkit-backdrop-filter: blur(16px) saturate(1.1);
+      box-shadow: 0 18px 45px rgba(0,0,0,.18);
+      max-width: 420px;
+    }
+
+    /* ===== Bottom tags: frosted glass pill WITH border ===== */
+    .cover-tags{
+      position: absolute;
+      left: 50%;
+      bottom: 122px;
+      transform: translateX(-50%);
       display: flex;
-      flex-wrap: nowrap;
-      gap: 14px;
-      padding-bottom: 56px; /* 给分页器留空间 */
-      align-items: center;
-    }
+      gap: 34px;
+      z-index: 2;
+      white-space: nowrap;
 
-    .tag{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 44px;
-      padding: 0 20px;
+      padding: 14px 26px;
       border-radius: 999px;
-      border: 1px solid rgba(15,23,42,.18);
-      background: rgba(255,255,255,.55);
-      color: rgba(15,23,42,.78);
-      font-weight: 800;
-      letter-spacing: .12em;
-      font-size: 14px;
-      white-space: nowrap; /* 不换行 */
-      backdrop-filter: blur(6px);
+
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(12px) saturate(1.15);
+      -webkit-backdrop-filter: blur(12px) saturate(1.15);
+
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow:
+        0 18px 45px rgba(0,0,0,.22),
+        inset 0 0 0 1px rgba(255,255,255,.08);
     }
 
-    /* 底部分页器（放在页面内部底部，离内容更近） */
-    .pager{
+    .cover-tag{
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      color: rgba(255,255,255,.72);
+      text-shadow: 0 12px 26px rgba(0,0,0,.55);
+    }
+
+    /* ====== Controls inside A4 ====== */
+    .controls{
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 18px;
+      bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      pointer-events: none; /* 纯展示，避免挡内容 */
+      gap: 18px;
+      z-index: 5;
+      user-select: none;
     }
+    .btn{
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(100,116,139,0.35);
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(6px);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn:active{ transform: scale(.96); }
+    .btn svg{ width: 16px; height: 16px; opacity: .75; }
 
-    .dotRow{
+    .dots{
       display: flex;
       gap: 8px;
-      align-items: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(100,116,139,0.25);
+      background: rgba(255,255,255,0.30);
+      backdrop-filter: blur(6px);
     }
     .dot{
       width: 7px;
       height: 7px;
-      border-radius: 99px;
-      background: rgba(15,23,42,.35);
+      border-radius: 999px;
+      background: rgba(100,116,139,0.45);
+      transition: transform .15s ease, background .15s ease;
     }
     .dot.active{
-      background: rgba(15,23,42,.78);
-    }
-    .btnCircle{
-      width: 34px;
-      height: 34px;
-      border-radius: 999px;
-      border: 1px solid rgba(15,23,42,.18);
-      background: rgba(255,255,255,.45);
-      backdrop-filter: blur(6px);
+      background: rgba(15,23,42,0.78);
+      transform: scale(1.22);
     }
 
-    /* 打印：取消缩放与阴影，输出 A4 */
+    /* Print */
     @media print{
-      body{ background:#fff; padding:0; overflow: visible; }
-      .stage{ transform:none !important; }
-      .page{ border:none; box-shadow:none; border-radius:0; }
-      .pager{ display:none; }
+      body{ background: white; padding: 0; }
+      .viewport{ box-shadow: none; border: none; border-radius: 0; }
+      .controls{ display: none !important; }
+      .scale-wrap{ transform: none !important; }
     }
+
+/* ===== Tooltip base ===== */
+#tooltip{
+  position: fixed;              /* 关键：让 left/top 生效 */
+  z-index: 9999;                /* 盖过卡片/背景/遮罩 */
+  display: none;
+  max-width: 340px;
+  padding: 12px 14px;
+  border-radius: 12px;
+
+  color: rgba(255,255,255,.92);
+  background: rgba(10, 14, 22, .92);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 18px 55px rgba(0,0,0,.55);
+
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+
+  font-family: "Noto Sans SC","Inter",system-ui,sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+
+  pointer-events: none;         /* hover 不会被 tooltip 自己打断 */
+}
+
+#tooltip .tt-title{
+  font-family: "Inter","Noto Sans SC",system-ui,sans-serif;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  opacity: .72;
+  margin-bottom: 6px;
+}
+
+/* ===== Tooltip trigger: soft blue ambient highlight ===== */
+.tip{
+  position: relative;
+  cursor: pointer;
+  color: rgba(255,255,255,.92);
+
+  /* ❌ 禁掉一切“线”的可能 */
+  text-decoration: none;
+  border-bottom: none;
+
+  /* ✅ 用“贴底柔光”代替横线 */
+  background:
+    linear-gradient(
+      to top,
+      rgba(120,180,255,.22),
+      rgba(120,180,255,0) 65%
+    );
+
+  padding: 0 2px;
+  border-radius: 3px;
+
+  transition:
+    color .15s ease,
+    background .15s ease;
+}
+
+.tip:hover{
+  color: #ffffff;
+  background:
+    linear-gradient(
+      to top,
+      rgba(120,180,255,.32),
+      rgba(120,180,255,0) 60%
+    );
+}
+
+
   </style>
 </head>
 
 <body>
-  <!-- 这个 stage 会被 JS 自动缩放以适配屏幕 -->
-  <div class="stage" id="stage">
-    <div class="page cover">
-      <div class="coverShade" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="scale-wrap" id="scaleWrap">
+      <div class="viewport" id="viewport">
+        <div class="pages" id="pages">
 
-      <div class="coverInner">
-        <div class="topbar">
-          <div class="mast">
-            <div class="line1">AI SIGNAL</div>
-            <div class="line2">AI INDUSTRY MAGAZINE</div>
-          </div>
-          <div class="issue">2026 · H1</div>
-        </div>
+          <!-- Page 1: Cover -->
+          <section class="page cover">
+            <div class="cover-top">
+              <div class="cover-meta">AI SIGNAL · AI INDUSTRY MAGAZINE</div>
+              <div class="cover-issue">2026 · H1</div>
+            </div>
 
-        <div class="hero">
-          <h1 class="title">智向</h1>
-          <div class="subtitle">2026 AI 行业趋势与实践</div>
-        </div>
+            <div class="title-block">
+              <div class="cover-title">智向</div>
+              <div class="cover-subtitle">2026 AI 行业趋势与实践</div>
+            </div>
 
-        <div class="tags" aria-label="栏目标签">
-          <span class="tag">趋势洞察</span>
-          <span class="tag">技术范式</span>
-          <span class="tag">产业变革</span>
-          <span class="tag">产品演进</span>
-        </div>
-      </div>
+            <div class="cover-tags" aria-label="sections">
+              <div class="cover-tag">趋势洞察</div>
+              <div class="cover-tag">技术范式</div>
+              <div class="cover-tag">产业变革</div>
+              <div class="cover-tag">产品演进</div>
+            </div>
+          </section>
 
-      <!-- 分页器（示例：封面是第1页） -->
-      <div class="pager" aria-hidden="true">
-        <div class="btnCircle"></div>
-        <div class="dotRow">
-          <div class="dot active"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-        <div class="btnCircle"></div>
-      </div>
+
+
+      <!-- Page 2: TOC (Techlife style, clean alignment, no boxes) -->
+<section class="page" style="position:relative; overflow:hidden;">
+
+  <!-- Background image (untouched) -->
+  <img
+    src="assets/images/toc-bg.png"
+    alt="TOC Background"
+    style="width:100%; height:100%; object-fit:cover; display:block;"
+  />
+
+  <!-- Shared styles for TOC (copy is inside this page; can be moved to global later) -->
+  <style>
+    /* ===== TOC shared styles (clean, no boxes, perfect alignment) ===== */
+    .toc-list { display:flex; flex-direction:column; gap:10px; }
+
+    .toc-section{
+      margin-top:10px;
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 11px;
+      letter-spacing: .22em;
+      color: rgba(255,255,255,.42);
+      transform: translateX(-4px); /* subtle editorial offset */
+    }
+
+    .toc-row{
+      display:flex;
+      align-items:baseline;
+      gap:12px;
+      text-decoration:none;
+      color: rgba(255,255,255,.90);
+      padding: 4px 0;
+      background: transparent !important;
+      border: 0 !important;
+      outline: none !important;
+      box-shadow: none !important;
+      transition: transform .18s ease, opacity .18s ease;
+      opacity:.88;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .toc-row:hover{
+      transform: translateX(2px);
+      opacity: 1;
+    }
+
+    .toc-num{
+      width: 28px;
+      flex: 0 0 28px;
+      font-family: Oswald, Inter, sans-serif;
+      font-size: 12px;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.55);
+    }
+
+    .toc-title{
+      flex: 1 1 auto;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.90);
+    }
+
+    .toc-title--lead{
+      font-size: 14px;
+      color: rgba(255,255,255,.92);
+    }
+  </style>
+
+  <!-- Text layer -->
+  <div
+    style="
+      position:absolute;
+      top:150px;
+      left:40px;
+      width:300px;
+      max-width:300px;
+      color:rgba(255,255,255,.92);
+      z-index:2;
+    "
+  >
+    <!-- Title -->
+    <div style="
+      font-family:Inter,system-ui,sans-serif;
+      font-size:40px;
+      font-weight:300;
+      letter-spacing:.08em;
+      margin-bottom:18px;
+    ">
+      SUMMARY
+    </div>
+
+    <!-- List -->
+    <div class="toc-list">
+      <!-- Lead -->
+      <a class="toc-row" href="javascript:go(2)" title="跳转到：2025年度AI十大趋势总结">
+        <span class="toc-num">02</span>
+        <span class="toc-title toc-title--lead">2025 年度 AI 十大趋势总结</span>
+      </a>
+
+      <div class="toc-section">SECTION 01 · 技术范式</div>
+
+      <a class="toc-row" href="javascript:go(3)" title="跳转到：Agent 与具身智能">
+        <span class="toc-num">03</span>
+        <span class="toc-title">Agent 与具身智能</span>
+      </a>
+
+      <div class="toc-section">SECTION 02 · 产业变革</div>
+
+      <a class="toc-row" href="javascript:go(4)" title="跳转到：AI 产业格局">
+        <span class="toc-num">04</span>
+        <span class="toc-title">AI 产业格局</span>
+      </a>
+
+      <a class="toc-row" href="javascript:go(5)" title="跳转到：六大 AI 巨头战略比较">
+        <span class="toc-num">05</span>
+        <span class="toc-title">六大 AI 巨头战略比较</span>
+      </a>
+
+      <a class="toc-row" href="javascript:go(6)" title="跳转到：企业级 AI 实践">
+        <span class="toc-num">06</span>
+        <span class="toc-title">企业级 AI 实践</span>
+      </a>
+
+      <div class="toc-section">SECTION 03 · 产品演进</div>
+
+      <a class="toc-row" href="javascript:go(7)" title="跳转到：面向消费者的 AI 产品">
+        <span class="toc-num">07</span>
+        <span class="toc-title">面向消费者的 AI 产品</span>
+      </a>
+
+      <a class="toc-row" href="javascript:go(8)" title="跳转到：图像 / 视频生成技术前沿">
+        <span class="toc-num">08</span>
+        <span class="toc-title">图像 / 视频生成技术前沿</span>
+      </a>
+
+      <div class="toc-section">SECTION 04 · 趋势洞察</div>
+
+      <a class="toc-row" href="javascript:go(9)" title="跳转到：2026 AI 趋势预测及产业战略展望">
+        <span class="toc-num">09</span>
+        <span class="toc-title">2026 AI 趋势预测及产业战略展望</span>
+      </a>
+    </div>
+
+    <!-- Note -->
+    <div style="
+      margin-top:18px;
+      font-family:Inter,system-ui,sans-serif;
+      font-size:10px;
+      letter-spacing:.12em;
+      opacity:.32;
+    ">
+      点击条目跳转 · 页码后续可调整
     </div>
   </div>
 
+</section>
+
+<!-- Article 01 · Page 3 (Cover) -->
+<section class="page" style="position:relative; overflow:hidden;">
+
+  <!-- Background image -->
+  <img
+    src="assets/images/article-cover.png"
+    alt="2025年度 AI 十大趋势：迈向“伙伴时代”的科技进化"
+    style="width:100%; height:100%; object-fit:cover; display:block;"
+  />
+
+  <!-- Optional subtle contrast (NO mask feeling) -->
+  <div style="
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(900px 650px at 25% 30%, rgba(0,0,0,.28), rgba(0,0,0,0) 60%),
+      linear-gradient(to top, rgba(0,0,0,.42), rgba(0,0,0,0) 55%);
+    pointer-events:none;
+  "></div>
+
+  <!-- Text block -->
+  <div style="
+    position:absolute;
+    left:76px;
+    bottom:118px;
+    width:600px;
+    color:rgba(255,255,255,.96);
+    z-index:2;
+  ">
+    <!-- Kicker -->
+    <div style="
+      font-family:Inter,system-ui,sans-serif;
+      font-size:12px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+      opacity:.72;
+      margin-bottom:16px;
+    ">
+      2025 AI ANNUAL REVIEW
+    </div>
+
+    <!-- Main title -->
+    <div style="
+      font-family:'Noto Sans SC',Inter,sans-serif;
+      font-size:46px;
+      font-weight:800;
+      line-height:1.16;
+      letter-spacing:-0.01em;
+      margin-bottom:16px;
+    ">
+     2025年度 AI 十大趋势：<br/>
+      迈向“伙伴时代”的科技进化
+    </div>
+
+    <!-- Subtitle -->
+    <div style="
+      font-family:'Noto Sans SC',Inter,sans-serif;
+      font-size:18px;
+      font-weight:500;
+      line-height:1.55;
+      opacity:.88;
+      margin-bottom:18px;
+      max-width:560px;
+    ">
+      年度人工智能发展回顾与趋势报告
+    </div>
+
+    <!-- Source -->
+    <div style="
+      font-family:Inter,'Noto Sans SC',system-ui,sans-serif;
+      font-size:13px;
+      line-height:1.6;
+      opacity:.62;
+      letter-spacing:.02em;
+    ">
+      来源：量子位智库《2025年度AI十大趋势报告》 & 全球前沿产业数据综述
+    </div>
+
+    <!-- Opening quote / lead -->
+    <div style="
+      margin-top:26px;
+      padding-left:14px;
+      border-left:2px solid rgba(255,255,255,.35);
+      font-family:'Noto Sans SC',Inter,sans-serif;
+      font-size:14px;
+      line-height:1.75;
+      opacity:.86;
+      max-width:560px;
+    ">
+    2025年，AI进入深水重构期，从底座到生态全面重写。算力战略化、模型工程化、应用多维化，中国步入加速窗口。人工智能正在成为全球科技与产业竞争的决定性力量。
+本报告提炼十大趋势，勾勒AI全年演进脉络，提供一个面向未来的理解框架。
+    </div>
+  </div>
+
+  <!-- Small footer -->
+  <div style="
+    position:absolute;
+    left:76px;
+    bottom:84px;
+    font-family:Inter,system-ui,sans-serif;
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.55);
+    z-index:2;
+  ">
+    INFRASTRUCTURE / MODELS / APPLICATIONS / CHINA TIME
+  </div>
+
+</section>
+
+<!-- Page 4 : Part 1 · Infrastructure -->
+<section class="page part1" style="position:relative; overflow:hidden;">
+
+
+<!-- Background (subtle, unified with cover) -->
+<div style="
+  position:absolute;
+  inset:0;
+  z-index:0;
+
+  /* 注意：图片放第一层，遮罩放后面；遮罩透明度要低 */
+  background:
+    url('assets/images/infra-bg.png') center/cover no-repeat,
+    radial-gradient(900px 700px at 20% 22%, rgba(10,18,32,.10), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, rgba(247,246,243,.72), rgba(247,246,243,.90));
+"></div>
+
+  <!-- Content -->
+  <div style="position:relative; z-index:2;">
+
+    <!-- Header -->
+    <div style="padding:36px 64px 26px 64px;">
+
+   <!-- Kicker -->
+  <div style="
+    font-family:Inter;
+    font-size:13px;
+    letter-spacing:.28em;
+    color:rgba(255,255,255,.65);
+    margin-bottom:10px;
+  ">
+    PART 1 · INFRASTRUCTURE
+  </div>
+
+ <!-- Title -->
+  <div style="
+    font-family:'Noto Sans SC',Inter;
+    font-size:38px;
+    font-weight:800;
+    margin-bottom:18px;
+    color:#ffffff;
+    text-shadow:0 6px 20px rgba(0,0,0,.35);
+  ">
+    PART 1 基础设施
+  </div>
+
+ <!-- Intro -->
+  <div style="
+    font-family:'Noto Sans SC',Inter;
+    font-size:18px;
+    line-height:1.9;
+    color:rgba(255,255,255,.82);
+    max-width:720px;
+    text-shadow:0 4px 16px rgba(0,0,0,.35);
+  ">
+    2025 年，算力与芯片成为智能时代的“水电煤”。全球 AI 需求激增，
+    算力作为关键资源上升为国家级战略资产。
+    与此同时，芯片架构加速向 AI 原生方向演进，国产算力生态快速成型，
+    正在重塑智能产业的底层格局。
+  </div>
+
+    </div>
+
+    <!-- Cards -->
+    <div style="
+      padding:32px 64px 72px 64px;
+      display:flex;
+      flex-direction:column;
+      gap:38px;
+    ">
+
+      <!-- Card 01 -->
+      <div style="
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12,20,34,.78),
+      rgba(7,11,18,.78)
+    );
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius:18px;
+  padding:32px 34px 30px 34px;
+  color:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 20px 60px rgba(15,23,42,.48);
+">
+
+
+        <div style="
+          font-family:Inter;
+          font-size:13px;
+          letter-spacing:.18em;
+          opacity:.55;
+          margin-bottom:6px;
+        ">
+          01
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:23px;
+          font-weight:700;
+          margin-bottom:14px;
+        ">
+          算力基建化
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:16.5px;
+          line-height:1.85;
+          color:rgba(255,255,255,.86);
+        ">
+        算力正由资源型资产转变为战略性基础设施。全球AI算力需求激增，各国竞逐建设“算力工厂”，2025年云厂商在专用算力上的投入高达2980亿美元。中国通过
+          <span class="tip" data-title="东数西算工程：" data-tip="通过将东部密集的数据与算力需求引导至能源资源更丰富的西部地区，构建全国一体化算力网络，提升算力调度效率并缓解能源与环境压力。">“东数西算”</span>
+
+          等项目加速全国算力统筹，并探索<span class="tip" data-title="太空超级计算机：" data-tip="将部分超算/边缘算力节点部署在太空（卫星/轨道平台），探索低延迟、高带宽、能源与散热新路径，为未来算力突破寻找增量空间。">“太空超级计算机”</span>等前沿路径，
+         算力基础的重构，正成为AI落地能力与国家科技主权的决定性变量。
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:16px;
+          opacity:.85;
+        ">
+          <span class="tip" data-title="国家算力网络：" data-tip="覆盖全国的算力基础设施网络，统一编排与调度跨地域算力资源，提升算力供给效率与可靠性，降低企业用算门槛。">国家算力网络</span>
+        </div>
+      </div>
+
+      <!-- Card 02 -->
+     <div style="
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12,20,34,.78),
+      rgba(7,11,18,.78)
+    );
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius:18px;
+  padding:32px 34px 30px 34px;
+  color:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 20px 60px rgba(15,23,42,.48);
+">
+
+
+        <div style="
+          font-family:Inter;
+          font-size:13px;
+          letter-spacing:.18em;
+          opacity:.55;
+          margin-bottom:6px;
+        ">
+          02
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:23px;
+          font-weight:700;
+          margin-bottom:14px;
+        ">
+          芯片 AI 化
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:16.5px;
+          line-height:1.85;
+          color:rgba(255,255,255,.86);
+        ">
+          AI 原生需求正在推动芯片从通用架构向<span class="tip" data-title="专用 AI 芯片多元化：" data-tip="NPU、ASIC、FPGA 等面向不同任务/部署形态的专用芯片加速发展，多元架构拓宽创新路径，算力市场不再由 GPU 单极主导。">专用化</span>演进。GPU受限于供应瓶颈，NPU、<span class="tip" data-title="ASIC（专用集成电路）" data-tip="ASIC (Application-Specific Integrated Circuit)：即“专用集成电路”。与通用的GPU不同，它是专门为AI特定算法（如Transformer架构）“量身定做”的芯片，去掉了图形渲染等无用模块，在推理任务中能效比通常高出30%-40%。">ASIC（专用集成电路）</span>、 <span class="tip" data-title="补充说明" data-tip="Field-Programmable Gate Array，现场可编程门阵列">FPGA</span>等 <span class="tip" data-title="云厂商自研芯片：" data-tip="Meta、谷歌、亚马逊等推出自研 ASIC/加速器，用于训练/推理与数据中心优化，构建算力护城河并降低对单一 GPU 供应依赖。">专用芯片</span>。加速崛起，终端侧智能硬件迎来爆发。
+中国正以“模型+芯片+SDK”构建全栈国产算力体系，成功支撑千亿级模型训练。芯片AI化的深化，将决定AI能力的边界与主导权归属。
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:16px;
+          opacity:.85;
+        ">
+         
+<span class="tip" data-title="中国语境下的芯片AI化：" data-tip="面对外部封锁，中国走出了“软硬协同”的独立路线。通过国产SDK（软件开发工具包）与国产芯片（如昇腾、寒武纪）的深度适配，以及全栈国产化的优化，中国已成功验证了在国产算力底座上进行千亿参数大模型全流程训练的能力。">国产芯片生态</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Page 5 : Part 2 · Model Evolution (Trends 03–05, vertical) -->
+<section class="page part2" style="position:relative; overflow:hidden;">
+
+ <!-- Background (same approach as Part1) -->
+  <div style="
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(180deg, rgba(9,12,18,.62), rgba(9,12,18,.86)),
+      url('assets/images/model-bg.png');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    z-index:0;
+  "></div>
+
+  <!-- (Optional) subtle grain for print feel -->
+  <div style="
+    position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.10;
+    background-image:
+      radial-gradient(rgba(255,255,255,.12) 1px, rgba(0,0,0,0) 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+  "></div>
+
+  <div style="position:relative; z-index:2;">
+
+    <!-- Header -->
+    <div style="padding:40px 64px 26px 64px;">
+
+      <div style="
+        font-family:Inter;
+        font-size:13px;
+        letter-spacing:.28em;
+        color:rgba(255,255,255,.66);
+        margin-bottom:10px;
+      ">
+        PART 2 · MODEL EVOLUTION
+      </div>
+
+      <div style="
+        font-family:'Noto Sans SC',Inter;
+        font-size:34px;
+        font-weight:800;
+        margin-bottom:16px;
+        color:#fff;
+      ">
+        Part 2 模型进化
+      </div>
+
+      <div style="
+        font-family:'Noto Sans SC',Inter;
+        font-size:16.5px;
+        line-height:1.75;
+        color:rgba(255,255,255,.82);
+        max-width:720px;
+      ">
+        2025年的模型竞赛不再一味追求参数规模，而是转向架构优化与推理效率。
+        预训练决定梯队，推理决定落地，同时模型正在走向能理解并作用于物理世界的“具身系统”。
+      </div>
+
+    </div>
+
+    <!-- Cards: vertical (A4 safe) -->
+    <div style="
+      padding:0 64px 110px 64px; /* bottom safe area: avoid controls */
+      display:flex;
+      flex-direction:column;
+      gap:38px;
+    ">
+
+      <!-- Card 03 -->
+      <div style="
+        background:rgba(12,20,34,.18);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius:18px;
+        padding:26px 30px 24px 30px;
+        color:rgba(255,255,255,.92);
+        border:1px solid rgba(255,255,255,.26);
+        box-shadow:0 18px 55px rgba(0,0,0,.42);
+      ">
+
+        <div style="
+          display:flex; justify-content:space-between; align-items:baseline;
+          margin-bottom:8px;
+        ">
+          <div style="font-family:Inter;font-size:13px;letter-spacing:.18em;opacity:.55;">03</div>
+          
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:21px;
+          font-weight:750;
+          margin-bottom:12px;
+        ">
+          架构创新：预训练决定梯队，MoE 架构决定高度
+        </div>
+
+        <div style="font-size:15px; line-height:1.7; color:rgba(255,255,255,.86);">
+        大模型格局正由预训练能力划出分层，核心突破转向底层架构创新。在算力受限背景下，  <span class="tip" data-title="MoE（Mixture of Experts，混合专家模型：）" data-tip="通过“大参数、小激活”的稀疏路由机制，每次只激活部分专家网络，在不等比例增加计算成本的前提下提升模型容量与能力上限。"> 混合专家（MoE）模型          </span>成为主流，“大参数、小激活”实现规模与效率兼顾。中国多家头部团队已广泛采用。与此同时，<span class="tip" data-title="稀疏注意力/线性注意力" data-tip="传统注意力需要计算所有 token 两两关系，成本高；稀疏注意力只计算关键 token 关系，线性注意力将复杂度降至近似线性，使模型更高效处理长文本、长视频等长程依赖任务。">
+           线性注意力、稀疏注意力
+          </span>
+等新机制崛起，用以突破长序列计算瓶颈，模型结构正从Transformer出发迈向更高效的新范式。中国头部模型团队普遍采用上述路径；
+          例如
+          <span class="tip" data-title=" 悟道 2.0（智源研究院）：" data-tip="通过开源混合专家架构将参数规模拓展至 1.75 万亿，成为中文万亿级模型的重要里程碑之一。其意义在于：在不等比例增加算力成本的情况下提升模型容量，为“架构创新优先”确立了范式。">
+            悟道 2.0
+          </span>
+          展示了在架构侧提升容量与效率的可行路径。
+        </div>
+      </div>
+
+      <!-- Card 04 -->
+        <div style="
+        background:rgba(12,20,34,.18);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        border-radius:18px;
+        padding:26px 30px 24px 30px;
+        color:rgba(255,255,255,.92);
+        border:1px solid rgba(255,255,255,.26);
+        box-shadow:0 18px 55px rgba(0,0,0,.42);
+      ">
+
+        <div style="
+          display:flex; justify-content:space-between; align-items:baseline;
+          margin-bottom:8px;
+        ">
+          <div style="font-family:Inter;font-size:13px;letter-spacing:.18em;opacity:.55;">04</div>
+         
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:21px;
+          font-weight:750;
+          margin-bottom:12px;
+        ">
+          推理革命：大模型落地进入“推理时间”
+        </div>
+
+        <div style="font-size:15px; line-height:1.7; color:rgba(255,255,255,.86);">
+          2025 年，大模型落地全面进入“推理时间”。复杂任务需求推动模型从“直觉快思考”走向“逻辑慢思考”，
+          <span class="tip" data-title="Test-Time Compute（测试时计算）" data-tip="在推理阶段增加计算预算（例如更长的推理步骤/更多候选路径/自我校验），用更长推理时间换取更高准确率与更强复杂问题求解能力，是“慢思考”能力的重要实现方式。">
+            Test-Time Compute
+          </span>
+          成为新范式；与此同时，海量实时推理场景倒逼模型在结构压缩、算子优化与高效部署上持续革新。
+          为了让模型能跑在手机、PC、汽车等终端上，
+          <span class="tip" data-title="模型蒸馏" data-tip="用更强的大模型“教”更小的模型，在保持关键能力的同时显著降低参数量与推理成本，使端侧部署成为可能。">
+            模型蒸馏
+          </span>
+          与
+          <span class="tip" data-title="端侧推理" data-tip="在本地设备（手机/PC/车端/边缘服务器）完成推理，优势是低延迟、隐私更强、成本更可控；挑战在于算力与功耗约束，需要模型压缩与硬件协同优化。">
+            端侧推理
+          </span>
+          成为刚需。以
+          <span class="tip" data-title="本地化推理示例" data-tip="通过模型压缩与硬件协同优化，一些开源推理模型已可在消费级终端更高效运行，支持翻译、代码生成等任务，减少对云端依赖并提升可用性。">
+            本地化推理
+          </span>
+          的进展为大规模应用铺平道路。
+        </div>
+
+      
+      </div>
+
+      <!-- Card 05 -->
+         <div style="
+        background:rgba(12,20,34,.18);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        border-radius:18px;
+        padding:26px 30px 24px 30px;
+        color:rgba(255,255,255,.92);
+        border:1px solid rgba(255,255,255,.26);
+        box-shadow:0 18px 55px rgba(0,0,0,.42);
+      ">
+
+        <div style="
+          display:flex; justify-content:space-between; align-items:baseline;
+          margin-bottom:8px;
+        ">
+          <div style="font-family:Inter;font-size:13px;letter-spacing:.18em;opacity:.55;">05</div>
+         
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:21px;
+          font-weight:750;
+          margin-bottom:12px;
+        ">
+        具身智能崛起，信息AI与物理AI汇流
+        </div>
+
+        <div style="font-size:15px; line-height:1.7; color:rgba(255,255,255,.86);">
+         AI正从理解世界迈向操控世界。信息领域的大模型应用已成规模，而物理场景的智能化刚起步。具身智能成为关键合流口，<span class="tip" data-title="VLA（Vision-Language-Action，视觉-语言-动作）模型：" data-tip="将摄像头画面与语言指令直接映射为机器人动作，实现端到端控制，是让机器人从“看懂”到“做对”的关键路径之一。">
+            VLA（视觉-语言-动作）模型
+          </span>
+和<span class="tip" data-title="世界模型（World Models）" data-tip="让 AI 在虚拟环境中学习/模拟物理规律（重力、碰撞、摩擦等），通过低成本试错获得物理常识，再迁移到现实世界，缓解机器人训练数据匮乏与现实试错昂贵的问题。">
+            世界模型
+          </span>
+构建起AI连接原子与比特的能力边界。机器人不再是“头脑简单、四肢发达”的代名词，正被大模型赋能为 <span class="tip" data-title="具身模型示例" data-tip="自变量机器人推出的 GreatWall 系列具身模型已实现端到端物理交互。优必选人形机器人进入工业、物流等场景，具身AI正从定制试验迈向批量落地">
+            可感知、可规划、可执行的智能体。          </span>。
+        </div>
+
+        
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Page 6 : Part 3 · Application Landscape -->
+<section class="page part3" style="position:relative; overflow:hidden;">
+
+  <!-- Background (slightly lighter / more transparent than your original) -->
+  <div style="
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:
+      radial-gradient(900px 650px at 20% 25%, rgba(0,0,0,.42), rgba(0,0,0,0) 62%),
+      linear-gradient(180deg, rgba(6,10,18,.56), rgba(6,10,18,.70)),
+      url('assets/images/app-bg.png');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+  "></div>
+
+  <!-- Page-local styles (cards + 4 different line illustrations) -->
+  <style>
+    /* ===== Part3 card grid ===== */
+   .part3-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 18px;
+  row-gap: 22px;
+
+  margin-top: 42px;
+  min-height: 520px;
+  align-content: space-between;
+}
+
+    /* ===== App cards base ===== */
+    .app-card{
+      position: relative;
+      overflow: hidden;
+      min-height: 250px; /* 保持你原来高度，不变 */
+      border-radius:18px;
+      padding:22px 22px 20px;
+      color:rgba(255,255,255,.92);
+
+      background: linear-gradient(180deg, rgba(12,20,34,.74), rgba(7,11,18,.74));
+      border:1px solid rgba(255,255,255,.20);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      box-shadow:0 18px 55px rgba(0,0,0,.45);
+    }
+
+    /* ===== Decoration layer (under text) ===== */
+    .app-card .card-decoration{
+      position:absolute;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+
+      background-repeat:no-repeat;
+      background-position: right bottom;
+      background-size: 260px auto;
+
+      opacity:.99;              /* 不抢文字 */
+      mix-blend-mode: screen;   /* 线稿更“发光”但克制 */
+    }
+
+    /* Ensure text above decoration */
+    .app-card > *:not(.card-decoration){
+      position: relative;
+      z-index:2;
+    }
+
+    /* ===== 4 different illustrations (replace filenames with yours) ===== */
+    .card-06 .card-decoration{ background-image:url('assets/decos/06_traffic_agentic.png'); }
+    .card-07 .card-decoration{ background-image:url('assets/decos/07_multimodal.png'); }
+    .card-08 .card-decoration{ background-image:url('assets/decos/08_devices.png'); }
+    .card-09 .card-decoration{ background-image:url('assets/decos/09_ai4s.png'); }
+
+    /* Optional: gentle vignette inside each card so text stays readable */
+    .app-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background: radial-gradient(600px 260px at 30% 20%, rgba(0,0,0,0), rgba(0,0,0,.18));
+    }
+  </style>
+
+  <!-- Content -->
+  <div style="position:relative; z-index:2; padding:36px 64px 110px;">
+
+    <!-- Header -->
+    <div style="margin-bottom:18px;">
+      <div style="
+        font-family:Inter;
+        font-size:13px;
+        letter-spacing:.28em;
+        opacity:.72;
+        color:rgba(255,255,255,.72);
+        margin-bottom:10px;
+      ">
+        PART 3 · APPLICATION LANDSCAPE
+      </div>
+
+      <div style="
+        font-family:'Noto Sans SC',Inter;
+        font-size:40px;
+        font-weight:800;
+        letter-spacing:-0.01em;
+        color:rgba(255,255,255,.96);
+        margin-bottom:14px;
+      ">
+        Part 3 应用版图
+      </div>
+
+      <div style="
+        font-family:'Noto Sans SC',Inter;
+        font-size:17px;
+        line-height:1.85;
+        max-width:720px;
+        color:rgba(255,255,255,.78);
+      ">
+        当底层能力趋于成熟，AI 应用在 2025 年大幅扩张：从信息世界走向物理世界，
+        从“工具”进化为“伙伴”。Agent 重塑人机交互与流量入口，多模态与 AI4S
+        把生产力与科研范式一起推到新阶段。
+      </div>
+    </div>
+
+    <!-- Cards grid (2x2) -->
+    <div class="part3-grid">
+
+      <!-- Card 06 -->
+      <div class="app-card card-06">
+        <div class="card-decoration"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+          <div style="font-family:Inter; font-size:13px; letter-spacing:.18em; opacity:.60;">06</div>
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:20px;
+          font-weight:750;
+          line-height:1.25;
+          margin-bottom:10px;
+        ">
+          AI重塑流量入口：PC互联网、移动互联网、Agentic互联网
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:14.8px;
+          line-height:1.75;
+          color:rgba(255,255,255,.82);
+        ">
+          互联网入口从搜索与 App 向 Agent 迁移。用户只需表达意图，Agent 即可规划与执行，
+          形成“服务找人”的新分发逻辑，成为用户与数字世界交互的
+          <span class="tip" data-title="流量入口垄断：" data-tip="操作系统与超级 App 正演化为超级 Agent 宿主，掌握分发权意味着掌握未来入口；传统 SEO（搜索引擎优化）将被 AIO（人工智能优化）取代。">
+            “唯一入口”
+          </span>。
+        </div>
+      </div>
+
+      <!-- Card 07 -->
+      <div class="app-card card-07">
+        <div class="card-decoration"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+          <div style="font-family:Inter; font-size:13px; letter-spacing:.18em; opacity:.60;">07</div>
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:20px;
+          font-weight:750;
+          line-height:1.25;
+          margin-bottom:10px;
+        ">
+          多模态AI应用落地关键：视频、3D、代码依次展现生产力
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:14.8px;
+          line-height:1.75;
+          color:rgba(255,255,255,.82);
+        ">
+          多模态不再是“演示能力”，而是成为了实质性的生产力工具。未来，视频、3D内容和软件开发的边际成本将趋近于零，
+          <span class="tip" data-title="具体案例" data-tip="影视行业使用视频生成工具快速产出动态分镜与特效预览；软件开发中，Vibe Coding 让非技术人员通过自然语言构建应用，AI 代码助手成为开发者标配。">
+            “创意产业和软件工程”
+          </span>
+          将迎来效率爆炸。
+        </div>
+      </div>
+
+      <!-- Card 08 -->
+      <div class="app-card card-08">
+        <div class="card-decoration"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+          <div style="font-family:Inter; font-size:13px; letter-spacing:.18em; opacity:.60;">08</div>
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:20px;
+          font-weight:750;
+          line-height:1.25;
+          margin-bottom:10px;
+        ">
+          AI硬件百端齐放：终端设备的集体“焕脑”时刻
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:14.8px;
+          line-height:1.75;
+          color:rgba(255,255,255,.82);
+        ">
+          AI 从 PC 与手机溢出，进入眼镜、车载、玩具与各类带电设备。
+          端侧算力提升与模型小型化叠加隐私与低延迟诉求，推动“本地智能”成为标配。
+          <span class="tip" data-title="补充说明" data-tip="代表设备：AI PC 成为办公标配；AI 眼镜通过多模态实时理解用户视角；儿童玩具接入大模型，具备对话与教育陪伴能力。">
+            “代表设备”
+          </span>
+          提示新一轮换机潮正在形成。
+        </div>
+      </div>
+
+      <!-- Card 09 -->
+      <div class="app-card card-09">
+        <div class="card-decoration"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+          <div style="font-family:Inter; font-size:13px; letter-spacing:.18em; opacity:.60;">09</div>
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:20px;
+          font-weight:750;
+          line-height:1.25;
+          margin-bottom:10px;
+        ">
+          AI4S 突破：AI 晋升为博士级“科研合作伙伴”
+        </div>
+
+        <div style="
+          font-family:'Noto Sans SC',Inter;
+          font-size:14.8px;
+          line-height:1.75;
+          color:rgba(255,255,255,.82);
+        ">
+          AI for Science 在生物、材料与数学证明等领域出现质变：从数据处理走向科学推理，
+          显著压缩研发周期，并被视作通向 AGI 的关键路径之一。
+          <span class="tip" data-title="补充说明" data-tip="通向 AGI 的路径：科学研究要求严谨推理、因果理解与物理常识。如果 AI 能自主提出假设并验证新知，将标志着通用智能能力的跃迁。">
+            “为什么重要”
+          </span>
+          也成为大国科研竞争的新战线。
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Page7: Part 4 · China Time -->
+<section class="page" style="position:relative; overflow:hidden;">
+
+  <!-- Background (FULL / contain, no crop) -->
+  <div style="position:absolute; inset:0; z-index:0; background:#070b12;">
+    <img
+      src="assets/images/china-bg.png"
+      alt="China Time Background"
+      style="width:100%; height:100%; object-fit:contain; object-position:center; display:block;"
+    />
+  </div>
+
+<!-- Color grade overlay (unify with Part3) -->
+<div style="
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(900px 600px at 50% 18%, rgba(5,10,20,.22), rgba(5,10,20,0) 70%),
+    linear-gradient(to bottom, rgba(5,10,20,.32), rgba(5,10,20,.14)),
+    linear-gradient(90deg, rgba(0,0,0,.10), rgba(0,0,0,0) 35%, rgba(0,0,0,.12));
+"></div>
+
+  <!-- Content -->
+  <div style="position:relative; z-index:2; padding:58px 64px 110px;">
+
+    <div style="max-width:720px;">
+      <div style="
+        font-family:Inter,system-ui,sans-serif;
+        font-size:12px; letter-spacing:.28em; text-transform:uppercase;
+        color:rgba(255,255,255,.78); opacity:.75; margin-bottom:12px;">
+        PART 4 · CHINA TIME
+      </div>
+
+      <div style="
+        font-family:'Noto Sans SC',Inter,sans-serif;
+        font-size:46px; font-weight:800; line-height:1.1;
+        color:rgba(255,255,255,.94); margin-bottom:18px;">
+        Part 4 中国时间
+      </div>
+
+      <div style="
+        font-family:'Noto Sans SC',Inter,sans-serif;
+        font-size:16.5px; line-height:1.85;
+        color:rgba(255,255,255,.78);">
+        2025年，中国AI全面提速，从应用落地迈向底层创新主导。自主芯片、开源模型、国家算力网络等基础工程加速成型，AI硬件、科研与开源生态多线突破。中国正以独有路径重塑AI格局，从“跟跑”走向“领跑”，为通往AGI提供一条具有全球影响力的“中国路线”。
+      </div>
+    </div>
+
+    <!-- Card -->
+    <div style="
+      margin-top:34px;
+      border-radius:18px;
+      padding:26px 30px 24px;
+      color:rgba(255,255,255,.92);
+      background:rgba(12,20,34,.22);
+      border:1px solid rgba(255,255,255,.26);
+      box-shadow:0 18px 55px rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    ">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="font-family:Inter; font-size:12px; letter-spacing:.18em; opacity:.75;">10</div>
+      
+      </div>
+
+      <div style="
+        margin-top:10px;
+        font-family:'Noto Sans SC',Inter;
+        font-size:24px; font-weight:750; line-height:1.25;
+        color:rgba(255,255,255,.94);
+        margin-bottom:14px;">
+        开源AI进入中国时间：AGI 拥有中国路线
+      </div>
+
+       <div style="
+        font-family:'Noto Sans SC',Inter;
+        font-size:15.2px;
+        line-height:1.85;
+        color:rgba(255,255,255,.82);
+      ">
+       中国正从AI创新的“跟跑者”转向“路线制定者”。2025年，开源大模型成为中国打通技术自主、生态建设与国际影响力的核心抓手。<span class="tip" data-tip="通义千问在 Hugging Face 的累计下载量突破 7 亿次，2025年12月单月下载量超越全球第2至第9名模型总和
+">
+            “通义千问”
+          </span>、DeepSeek等国产模型跻身全球主流，Qwen单月下载量已超越LLaMA等国际巨头，中国正式进入开源AI“第一阵营”。借助庞大市场、算力网络与全栈自研体系，中国正走出一条通向AGI的独立路径，并重塑全球开源力量格局。
+      </div>
+
+      
+
+  </div>
+</section>
+
+
+
+
+
+
+
+        </div> <!-- /#pages -->
+
+        <!-- Controls -->
+        <div class="controls">
+          <div class="btn" id="prevBtn" title="上一页">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="dots" id="dots"></div>
+
+          <div class="btn" id="nextBtn" title="下一页">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+      </div> <!-- /.viewport -->
+    </div> <!-- /.scale-wrap -->
+  </div> <!-- /.stage -->
+
   <script>
-    // 自动把 A4 画布缩放到屏幕可见区域（解决“没有屏幕适应缩放、文字显示不全”）
-    (function () {
-      const stage = document.getElementById('stage');
-      const A4W = 794, A4H = 1123;
+    // ====== Fit A4 into viewport ======
+    const scaleWrap = document.getElementById('scaleWrap');
 
-      function fit() {
-        const pad = 24; // 给四周留一点黑边
-        const vw = window.innerWidth - pad;
-        const vh = window.innerHeight - pad;
+    function fit(){
+      const a4w = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--a4-w'));
+      const a4h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--a4-h'));
 
-        const s = Math.min(vw / A4W, vh / A4H, 1); // 不放大超过 1（避免糊）
-        stage.style.transform = `scale(${s})`;
+      const padding = 24;
+      const vw = window.innerWidth - padding;
+      const vh = window.innerHeight - padding;
+
+      const s = Math.min(vw / a4w, vh / a4h, 1);
+      scaleWrap.style.transform = `scale(${s})`;
+    }
+    window.addEventListener('resize', fit);
+    fit();
+
+    // ====== Pagination ======
+    const pages = document.getElementById('pages');
+    const dots = document.getElementById('dots');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let idx = 0;
+
+    function pageCount(){
+      return pages ? pages.children.length : 0;
+    }
+
+    function renderDots(){
+      if(!dots) return;
+      dots.innerHTML = '';
+      const n = pageCount();
+      for(let i=0;i<n;i++){
+        const d = document.createElement('div');
+        d.className = 'dot' + (i===idx ? ' active' : '');
+        d.addEventListener('click', () => go(i));
+        dots.appendChild(d);
       }
+    }
 
-      window.addEventListener('resize', fit);
-      fit();
-    })();
+    function go(i){
+      const n = pageCount();
+      if(!pages || n === 0) return;
+      idx = Math.max(0, Math.min(n-1, i));
+      const a4w = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--a4-w'));
+      pages.style.transform = `translateX(${-idx * a4w}px)`;
+      renderDots();
+    }
 
-    // 说明：你之前看到的 “LF / 奇怪符号” 一般是 HTML 里被插入了文字节点或拷贝残留。
-    // 这份代码里没有任何 LF 文本。如果你仍看到，请确认你覆盖了旧 index.html（不要混用两份）。
+    if(prevBtn) prevBtn.addEventListener('click', () => go(idx-1));
+    if(nextBtn) nextBtn.addEventListener('click', () => go(idx+1));
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowLeft') go(idx-1);
+      if(e.key === 'ArrowRight') go(idx+1);
+    });
+
+    renderDots();
+    go(0);
+
+// ===== Tooltip engine (global) =====
+let tooltipEl = document.getElementById('tooltip');
+if(!tooltipEl){
+  tooltipEl = document.createElement('div');
+  tooltipEl.id = 'tooltip';
+  document.body.appendChild(tooltipEl);
+}
+
+let pinned = false;
+
+function showTip(target){
+  const text = target.getAttribute('data-tip') || '';
+  const title = target.getAttribute('data-title') || 'NOTE';
+
+  tooltipEl.innerHTML = `<div class="tt-title">${title}</div><div>${text}</div>`;
+  tooltipEl.style.display = 'block';
+
+  const r = target.getBoundingClientRect();
+  const pad = 12;
+
+  // default: above center
+  let x = r.left + r.width/2;
+  let y = r.top;
+
+  // measure tooltip size
+  const tw = tooltipEl.offsetWidth;
+  const th = tooltipEl.offsetHeight;
+
+  // place above if possible, else below
+  let left = x - tw/2;
+  let top = y - th - 10;
+
+  if(top < pad) top = r.bottom + 10;
+  if(left < pad) left = pad;
+  if(left + tw > window.innerWidth - pad) left = window.innerWidth - pad - tw;
+
+  tooltipEl.style.left = `${left}px`;
+  tooltipEl.style.top = `${top}px`;
+}
+
+function hideTip(){
+  if(pinned) return;
+  tooltipEl.style.display = 'none';
+}
+
+document.addEventListener('mouseover', (e)=>{
+  const t = e.target.closest('.tip');
+  if(!t || pinned) return;
+  showTip(t);
+});
+
+document.addEventListener('mouseout', (e)=>{
+  const t = e.target.closest('.tip');
+  if(!t || pinned) return;
+  hideTip();
+});
+
+document.addEventListener('click', (e)=>{
+  const t = e.target.closest('.tip');
+  if(t){
+    // click to pin/unpin
+    if(pinned){
+      pinned = false;
+      hideTip();
+    }else{
+      pinned = true;
+      showTip(t);
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  // click blank to close
+  pinned = false;
+  hideTip();
+});
+
+// when page changes / resize, close tooltip
+window.addEventListener('resize', ()=>{ pinned=false; hideTip(); });
+
   </script>
 </body>
 </html>
-
